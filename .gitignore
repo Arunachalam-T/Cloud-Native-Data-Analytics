@@ -1,0 +1,13 @@
+.env
+*.jar
+*.class
+target/
+build/
+.DS_Store
+*.log
+*.iml
+.idea/
+.vscode/
+*.swp
+node_modules/
+*.orig

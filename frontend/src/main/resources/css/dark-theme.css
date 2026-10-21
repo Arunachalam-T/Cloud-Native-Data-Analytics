@@ -1,0 +1,304 @@
+/* ═══════════════════════════════════════════════════════════════
+   Cloud-Native Data Analytics Terminal — Dark Theme
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Color Tokens ────────────────────────────────────────────── */
+* {
+    -bg-primary:    #0f1117;
+    -bg-secondary:  #161b27;
+    -bg-surface:    #1e2535;
+    -bg-hover:      #252d3d;
+    -accent:        #6366f1;
+    -accent-hover:  #818cf8;
+    -accent-glow:   rgba(99,102,241,0.25);
+    -text-primary:  #f1f5f9;
+    -text-secondary:#94a3b8;
+    -text-muted:    #475569;
+    -border:        #2d3748;
+    -success:       #4ade80;
+    -warning:       #facc15;
+    -danger:        #f87171;
+    -chart-1:       #6366f1;
+    -chart-2:       #22d3ee;
+    -chart-3:       #4ade80;
+    -chart-4:       #f472b6;
+    -chart-5:       #fb923c;
+}
+
+/* ── Base ─────────────────────────────────────────────────────── */
+.root-pane {
+    -fx-background-color: -bg-primary;
+}
+
+.root {
+    -fx-font-family: "Inter", "Segoe UI", system;
+    -fx-font-size: 13px;
+    -fx-background-color: -bg-primary;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+.sidebar {
+    -fx-background-color: -bg-secondary;
+    -fx-border-color: -border;
+    -fx-border-width: 0 1 0 0;
+}
+
+.sidebar-logo {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -accent-hover;
+    -fx-padding: 0 0 2 0;
+}
+
+.sidebar-subtitle {
+    -fx-font-size: 10px;
+    -fx-text-fill: -text-muted;
+    -fx-padding: 0 0 8 0;
+}
+
+.sidebar-divider {
+    -fx-background-color: -border;
+    -fx-padding: 4 0;
+}
+
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-secondary;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 14;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+
+.nav-btn:hover {
+    -fx-background-color: -bg-hover;
+    -fx-text-fill: -text-primary;
+}
+
+.nav-btn-active {
+    -fx-background-color: -accent-glow;
+    -fx-text-fill: -accent-hover;
+    -fx-border-color: -accent;
+    -fx-border-width: 0 0 0 2;
+}
+
+/* ── Connection Indicator ────────────────────────────────────── */
+.connection-indicator {
+    -fx-background-color: rgba(74,222,128,0.08);
+    -fx-background-radius: 6;
+    -fx-padding: 6 10;
+}
+
+.status-dot-green { -fx-text-fill: -success; -fx-font-size: 10px; }
+.connection-label { -fx-text-fill: -text-muted; -fx-font-size: 11px; }
+
+/* ── Topbar ───────────────────────────────────────────────────── */
+.topbar {
+    -fx-background-color: -bg-secondary;
+    -fx-border-color: -border;
+    -fx-border-width: 0 0 1 0;
+}
+
+.page-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn-primary {
+    -fx-background-color: -accent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 18;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-primary:hover { -fx-background-color: -accent-hover; }
+
+.btn-danger {
+    -fx-background-color: rgba(248,113,113,0.15);
+    -fx-text-fill: -danger;
+    -fx-border-color: rgba(248,113,113,0.4);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+.btn-danger:hover { -fx-background-color: rgba(248,113,113,0.25); }
+
+.btn-secondary {
+    -fx-background-color: -bg-surface;
+    -fx-text-fill: -text-secondary;
+    -fx-border-color: -border;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover { -fx-background-color: -bg-hover; -fx-text-fill: -text-primary; }
+
+/* ── TableView ───────────────────────────────────────────────── */
+.data-table {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.data-table .column-header-background {
+    -fx-background-color: -bg-secondary;
+}
+
+.data-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -border transparent;
+}
+
+.data-table .column-header .label {
+    -fx-text-fill: -text-secondary;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.data-table .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-padding: 2 0;
+}
+
+.data-table .table-row-cell:odd {
+    -fx-background-color: rgba(255,255,255,0.02);
+}
+
+.data-table .table-row-cell:hover {
+    -fx-background-color: -bg-hover;
+}
+
+.data-table .table-row-cell:selected {
+    -fx-background-color: -accent-glow;
+    -fx-border-color: -accent;
+}
+
+.data-table .table-cell {
+    -fx-text-fill: -text-primary;
+    -fx-padding: 10 14;
+}
+
+.table-placeholder {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 14px;
+}
+
+/* ── Status Bar ───────────────────────────────────────────────── */
+.statusbar {
+    -fx-background-color: -bg-secondary;
+    -fx-border-color: -border;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-label {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 12px;
+}
+
+/* ── Progress Indicator ───────────────────────────────────────── */
+.progress-indicator > .indicator { -fx-background-color: transparent; }
+.progress-indicator > .indicator > .arc-track { -fx-stroke: -accent; }
+
+/* ── Detail View ─────────────────────────────────────────────── */
+.detail-header {
+    -fx-background-color: -bg-secondary;
+    -fx-border-color: -border;
+    -fx-border-width: 0 0 1 0;
+}
+
+.detail-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+    -fx-padding: 0 0 8 0;
+}
+
+.meta-label { -fx-text-fill: -text-muted; -fx-font-size: 12px; }
+.meta-value { -fx-text-fill: -text-primary; -fx-font-size: 12px; -fx-font-weight: bold; }
+
+/* ── TabPane ─────────────────────────────────────────────────── */
+.detail-tabs {
+    -fx-background-color: -bg-primary;
+    -fx-tab-min-height: 40px;
+}
+
+.detail-tabs .tab-header-area {
+    -fx-background-color: -bg-secondary;
+    -fx-border-color: -border;
+    -fx-border-width: 0 0 1 0;
+}
+
+.detail-tabs .tab {
+    -fx-background-color: transparent;
+    -fx-padding: 8 16;
+}
+
+.detail-tabs .tab .tab-label {
+    -fx-text-fill: -text-secondary;
+    -fx-font-size: 13px;
+}
+
+.detail-tabs .tab:selected {
+    -fx-background-color: -accent-glow;
+    -fx-border-color: transparent transparent -accent transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+.detail-tabs .tab:selected .tab-label { -fx-text-fill: -accent-hover; }
+.detail-tabs .tab:hover .tab-label   { -fx-text-fill: -text-primary;  }
+
+/* ── Report TextArea ─────────────────────────────────────────── */
+.report-textarea {
+    -fx-background-color: -bg-surface;
+    -fx-text-fill: -text-primary;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+    -fx-font-size: 12.5px;
+    -fx-control-inner-background: -bg-surface;
+    -fx-border-color: transparent;
+    -fx-padding: 16;
+}
+.report-textarea .content { -fx-background-color: -bg-surface; }
+
+/* ── Quality Score ───────────────────────────────────────────── */
+.quality-score {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 0;
+}
+
+/* ── Charts ──────────────────────────────────────────────────── */
+.charts-scroll { -fx-background-color: -bg-primary; }
+
+.chart {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 16;
+}
+
+.chart-title { -fx-text-fill: -text-primary; -fx-font-weight: bold; }
+.chart-legend { -fx-background-color: transparent; }
+.axis-label   { -fx-text-fill: -text-secondary; }
+.axis         { -fx-tick-label-fill: -text-muted; }
+
+.chart-bar    { -fx-bar-fill: -accent; }
+.chart-bar:hover { -fx-bar-fill: -accent-hover; }
+.scatter-chart .chart-symbol { -fx-background-color: -chart-2; -fx-background-radius: 3; }
+
+/* ── ScrollBar ───────────────────────────────────────────────── */
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+.scroll-bar .track { -fx-background-color: -bg-secondary; }
+.scroll-bar .thumb { -fx-background-color: -border; -fx-background-radius: 4; }
+.scroll-bar .thumb:hover { -fx-background-color: -text-muted; }

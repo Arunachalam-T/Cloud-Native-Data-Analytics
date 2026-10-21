@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.dataanalytics.ui.controller.MainViewController"
+            styleClass="root-pane">
+
+    <!-- ═══ LEFT SIDEBAR ═══════════════════════════════════════ -->
+    <left>
+        <VBox fx:id="sidebar" styleClass="sidebar" prefWidth="220" spacing="4">
+            <padding><Insets top="24" right="12" bottom="24" left="12"/></padding>
+
+            <!-- Logo / Branding -->
+            <Label text="⬡ DataAnalytics" styleClass="sidebar-logo"/>
+            <Label text="Cloud-Native Terminal" styleClass="sidebar-subtitle"/>
+            <Separator styleClass="sidebar-divider"/>
+
+            <!-- Nav buttons -->
+            <Button fx:id="btnDashboard" text="📊  Dashboard"
+                    styleClass="nav-btn, nav-btn-active" maxWidth="Infinity"/>
+            <Button fx:id="btnUpload" text="⬆  Upload Dataset"
+                    styleClass="nav-btn" maxWidth="Infinity"
+                    onAction="#handleUploadAction"/>
+            <Button fx:id="btnDatasets" text="🗄  All Datasets"
+                    styleClass="nav-btn" maxWidth="Infinity"/>
+            <Separator styleClass="sidebar-divider"/>
+            <Button fx:id="btnSettings" text="⚙  Settings"
+                    styleClass="nav-btn" maxWidth="Infinity"/>
+
+            <VBox VBox.vgrow="ALWAYS"/>
+
+            <!-- Connection indicator -->
+            <HBox styleClass="connection-indicator" spacing="8" alignment="CENTER_LEFT">
+                <Label text="●" styleClass="status-dot-green"/>
+                <Label text="Connected to backend" styleClass="connection-label"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- ═══ MAIN CONTENT ════════════════════════════════════════ -->
+    <center>
+        <VBox>
+            <!-- Top bar -->
+            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16">
+                <padding><Insets top="16" right="24" bottom="16" left="24"/></padding>
+                <Label fx:id="lblPageTitle" text="Dashboard" styleClass="page-title"/>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <Button text="⬆  Upload Dataset" styleClass="btn-primary"
+                        onAction="#handleUploadAction"/>
+                <Button text="🗑  Delete Selected" styleClass="btn-danger"
+                        onAction="#handleDeleteSelected"/>
+                <Button text="↻  Refresh" styleClass="btn-secondary"
+                        onAction="#refreshDatasets"/>
+            </HBox>
+
+            <!-- Dataset Table -->
+            <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS">
+                <padding><Insets top="16" right="24" bottom="16" left="24"/></padding>
+                <TableView fx:id="tblDatasets" styleClass="data-table">
+                    <columns>
+                        <TableColumn fx:id="colName"    text="Dataset Name"  prefWidth="220"/>
+                        <TableColumn fx:id="colStatus"  text="Status"        prefWidth="110"/>
+                        <TableColumn fx:id="colRows"    text="Rows"          prefWidth="90"/>
+                        <TableColumn fx:id="colCols"    text="Columns"       prefWidth="80"/>
+                        <TableColumn fx:id="colFormat"  text="Format"        prefWidth="80"/>
+                        <TableColumn fx:id="colCreated" text="Created At"    prefWidth="180"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="No datasets yet. Upload your first dataset! 🚀"
+                               styleClass="table-placeholder"/>
+                    </placeholder>
+                </TableView>
+            </StackPane>
+
+            <!-- Status Bar -->
+            <HBox styleClass="statusbar" alignment="CENTER_LEFT" spacing="12">
+                <padding><Insets top="6" right="20" bottom="6" left="20"/></padding>
+                <ProgressIndicator fx:id="progressIndicator" prefWidth="16" prefHeight="16"
+                                   visible="false"/>
+                <Label fx:id="lblStatus" text="Ready" styleClass="status-label"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

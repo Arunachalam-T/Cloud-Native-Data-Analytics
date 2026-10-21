@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.dataanalytics.ui.controller.DatasetDetailController"
+            styleClass="root-pane">
+
+    <!-- ═══ HEADER ══════════════════════════════════════════════ -->
+    <top>
+        <VBox styleClass="detail-header">
+            <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+            <Label fx:id="lblDatasetName" text="Dataset" styleClass="detail-title"/>
+            <HBox spacing="32" alignment="CENTER_LEFT">
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="Status:" styleClass="meta-label"/>
+                    <Label fx:id="lblStatus" text="—" styleClass="meta-value"/>
+                </HBox>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="Rows:" styleClass="meta-label"/>
+                    <Label fx:id="lblRows" text="—" styleClass="meta-value"/>
+                </HBox>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="Columns:" styleClass="meta-label"/>
+                    <Label fx:id="lblCols" text="—" styleClass="meta-value"/>
+                </HBox>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="Format:" styleClass="meta-label"/>
+                    <Label fx:id="lblFormat" text="—" styleClass="meta-value"/>
+                </HBox>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="File Size:" styleClass="meta-label"/>
+                    <Label fx:id="lblFileSize" text="—" styleClass="meta-value"/>
+                </HBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ═══ TABBED CONTENT ═══════════════════════════════════════ -->
+    <center>
+        <TabPane fx:id="tabPane" styleClass="detail-tabs" tabClosingPolicy="UNAVAILABLE">
+
+            <!-- Data Preview -->
+            <Tab fx:id="tabPreview" text="📋  Data Preview">
+                <TableView fx:id="tblPreview" styleClass="data-table">
+                    <placeholder>
+                        <Label text="Loading preview..." styleClass="table-placeholder"/>
+                    </placeholder>
+                </TableView>
+            </Tab>
+
+            <!-- EDA Report -->
+            <Tab fx:id="tabEda" text="📈  EDA Report">
+                <TextArea fx:id="txtEdaReport" styleClass="report-textarea"
+                          editable="false" wrapText="false"
+                          fontFamily="Consolas, monospace"/>
+            </Tab>
+
+            <!-- Data Quality -->
+            <Tab fx:id="tabQuality" text="🔍  Data Quality">
+                <VBox spacing="12">
+                    <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+                    <Label fx:id="lblQualityScore" text="Overall Score: —"
+                           styleClass="quality-score"/>
+                    <TextArea fx:id="txtQualityReport" styleClass="report-textarea"
+                              editable="false" wrapText="false"
+                              VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </Tab>
+
+            <!-- Charts -->
+            <Tab fx:id="tabCharts" text="📊  Visualizations">
+                <ScrollPane fitToWidth="true" styleClass="charts-scroll">
+                    <VBox fx:id="chartsContainer" spacing="20">
+                        <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+        </TabPane>
+    </center>
+
+    <!-- ═══ STATUS BAR ════════════════════════════════════════════ -->
+    <bottom>
+        <HBox styleClass="statusbar" alignment="CENTER_LEFT" spacing="12">
+            <padding><Insets top="6" right="20" bottom="6" left="20"/></padding>
+            <ProgressIndicator fx:id="progressIndicator" prefWidth="16" prefHeight="16" visible="true"/>
+            <Label fx:id="lblStatusBar" text="Loading..." styleClass="status-label"/>
+        </HBox>
+    </bottom>
+</BorderPane>
