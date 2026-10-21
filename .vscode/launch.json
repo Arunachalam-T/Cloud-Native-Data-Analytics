@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "▶ Run Backend (Spring Boot)",
+            "request": "launch",
+            "mainClass": "com.dataanalytics.DataAnalyticsApplication",
+            "projectName": "data-analytics-backend"
+        },
+        {
+            "type": "java",
+            "name": "▶ Run Frontend (JavaFX)",
+            "request": "launch",
+            "mainClass": "com.dataanalytics.ui.Launcher",
+            "projectName": "data-analytics-frontend"
+        }
+    ]
+}

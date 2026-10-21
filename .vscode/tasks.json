@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Backend (Spring Boot)",
+            "type": "shell",
+            "command": "${workspaceFolder}\\run-backend.bat",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run Frontend (JavaFX)",
+            "type": "shell",
+            "command": "${workspaceFolder}\\run-frontend.bat",
+            "problemMatcher": [],
+            "group": "build"
+        }
+    ]
+}
