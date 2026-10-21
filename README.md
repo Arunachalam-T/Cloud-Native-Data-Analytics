@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ⬡ Cloud-Native Data Analytics Terminal
 
 A full-stack desktop data analytics platform for uploading, analyzing, visualizing, and managing datasets — backed by Spring Boot, PostgreSQL, and AWS S3, with a JavaFX desktop interface.
@@ -231,3 +232,7 @@ For the CD deploy workflow, add these secrets to your GitHub repository:
 ## 📄 License
 
 MIT — see [LICENSE](LICENSE) for details.
+=======
+# Cloud-Native-Data-Analytics
+The Cloud-Native Data Analytics Terminal is a desktop-based data analytics platform for uploading, analyzing, visualizing, and managing datasets.
+>>>>>>> 01f0270e74883c0bff0579de66401ac223d99980
