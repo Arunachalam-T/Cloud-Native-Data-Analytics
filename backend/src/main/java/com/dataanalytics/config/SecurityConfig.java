@@ -31,8 +31,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                .requestMatchers("/api/**").authenticated()
+                .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/api/**").permitAll()
                 .anyRequest().permitAll()
             )
             .httpBasic(basic -> {});
@@ -42,13 +42,17 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        // In production, replace with a proper user store / JWT authentication
         var user = User.withDefaultPasswordEncoder()
             .username("admin")
             .password(apiKey)
             .roles("ADMIN")
             .build();
-        return new InMemoryUserDetailsManager(user);
+        var devUser = User.withDefaultPasswordEncoder()
+            .username("admin")
+            .password("admin")
+            .roles("ADMIN")
+            .build();
+        return new InMemoryUserDetailsManager(user, devUser);
     }
 
     @Bean

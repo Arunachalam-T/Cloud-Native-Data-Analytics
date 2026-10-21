@@ -11,8 +11,8 @@ import java.io.IOException;
 public class MainApp extends Application {
 
     public static final String APP_TITLE = "Cloud-Native Data Analytics Terminal";
-    public static final String BASE_URL = System.getenv().getOrDefault("API_BASE_URL", "http://localhost:8080");
-    public static final String API_KEY  = System.getenv().getOrDefault("API_KEY", "admin");
+    public static final String BASE_URL = System.getProperty("API_BASE_URL", System.getenv().getOrDefault("API_BASE_URL", "http://localhost:8080"));
+    public static final String API_KEY  = System.getProperty("API_KEY", System.getenv().getOrDefault("API_KEY", "dev-secret-key-change-in-prod"));
 
     @Override
     public void start(Stage stage) throws IOException {
