@@ -33,7 +33,7 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      DB_URL: jdbc:postgresql://postgres:5432/dataanalytics
+      DB_URL: ${DB_URL:-jdbc:postgresql://postgres:5432/dataanalytics}
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}

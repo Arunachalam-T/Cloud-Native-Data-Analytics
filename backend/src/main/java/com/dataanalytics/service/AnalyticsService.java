@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tech.tablesaw.api.*;
+import tech.tablesaw.columns.Column;
 import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class AnalyticsService {
             .build();
     }
 
-    private EdaReportDto.ColumnEdaDto analyzeColumn(tech.tablesaw.api.Column<?> col, int totalRows) {
+    private EdaReportDto.ColumnEdaDto analyzeColumn(Column<?> col, int totalRows) {
         EdaReportDto.ColumnEdaDto.ColumnEdaDtoBuilder builder = EdaReportDto.ColumnEdaDto.builder()
             .columnName(col.name())
             .dataType(col.type().name())
@@ -73,7 +74,8 @@ public class AnalyticsService {
 
             // Quartiles via sorted values
             try {
-                DoubleColumn sorted = numCol.asDoubleColumn().sortAscending();
+                DoubleColumn sorted = numCol.asDoubleColumn().copy();
+                sorted.sortAscending();
                 int n = sorted.size();
                 if (n > 0) {
                     builder.median(roundTo4(percentile(sorted, 50)));
@@ -87,8 +89,8 @@ public class AnalyticsService {
                     // IQR-based outlier detection
                     double lower = q1 - 1.5 * iqr;
                     double upper = q3 + 1.5 * iqr;
-                    List<Double> outliers = sorted.stream()
-                        .filter(v -> v < lower || v > upper)
+                    List<Double> outliers = sorted.asList().stream()
+                        .filter(v -> v != null && (v < lower || v > upper))
                         .distinct()
                         .limit(20)
                         .collect(Collectors.toList());
@@ -98,31 +100,28 @@ public class AnalyticsService {
 
         } else if (col instanceof StringColumn || col instanceof TextColumn) {
             // Value counts for categoricals (top 20)
-            Map<String, Long> valueCounts = new LinkedHashMap<>();
+            Map<String, Long> rawCounts = new LinkedHashMap<>();
+            for (int r = 0; r < col.size(); r++) {
+                if (!col.isMissing(r)) {
+                    String val = col.getString(r);
+                    rawCounts.merge(val, 1L, Long::sum);
+                }
+            }
+
             String mostFrequent = null;
             long mostFreqCount = 0;
-
-            try {
-                var counts = col.countByCategory();
-                for (var entry : counts.entrySet()) {
-                    valueCounts.put(entry.getKey(), (long) entry.getValue());
-                    if ((long) entry.getValue() > mostFreqCount) {
-                        mostFreqCount = (long) entry.getValue();
-                        mostFrequent = entry.getKey();
-                    }
+            for (var entry : rawCounts.entrySet()) {
+                if (entry.getValue() > mostFreqCount) {
+                    mostFreqCount = entry.getValue();
+                    mostFrequent = entry.getKey();
                 }
-            } catch (Exception e) {
-                log.warn("Could not compute value counts for column {}: {}", col.name(), e.getMessage());
             }
 
-            if (valueCounts.size() > 20) {
-                // Keep top 20 by count
-                valueCounts = valueCounts.entrySet().stream()
-                    .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                    .limit(20)
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (e1, e2) -> e1, LinkedHashMap::new));
-            }
+            Map<String, Long> valueCounts = rawCounts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(20)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                    (e1, e2) -> e1, LinkedHashMap::new));
 
             builder.valueCounts(valueCounts)
                    .mostFrequentValue(mostFrequent)
@@ -136,7 +135,7 @@ public class AnalyticsService {
         Map<String, Object> matrix = new LinkedHashMap<>();
         List<String> numericCols = table.columns().stream()
             .filter(c -> c instanceof NumericColumn<?>)
-            .map(tech.tablesaw.api.Column::name)
+            .map(Column::name)
             .collect(Collectors.toList());
 
         for (String col1 : numericCols) {

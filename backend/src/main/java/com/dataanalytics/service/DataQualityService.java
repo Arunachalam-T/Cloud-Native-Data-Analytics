@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tech.tablesaw.api.*;
+import tech.tablesaw.columns.Column;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,7 +62,7 @@ public class DataQualityService {
     }
 
     private DataQualityReportDto.ColumnQualityDto analyzeColumnQuality(
-            tech.tablesaw.api.Column<?> col, int totalRows,
+            Column<?> col, int totalRows,
             List<String> warnings, List<String> recommendations) {
 
         long nullCount = col.countMissing();
@@ -75,15 +76,16 @@ public class DataQualityService {
         long outlierCount = 0;
         if (col instanceof NumericColumn<?> numCol) {
             try {
-                DoubleColumn sorted = numCol.asDoubleColumn().sortAscending();
+                DoubleColumn sorted = numCol.asDoubleColumn().copy();
+                sorted.sortAscending();
                 if (sorted.size() > 3) {
                     double q1 = percentile(sorted, 25);
                     double q3 = percentile(sorted, 75);
                     double iqr = q3 - q1;
                     double lower = q1 - 1.5 * iqr;
                     double upper = q3 + 1.5 * iqr;
-                    outlierCount = sorted.stream()
-                        .filter(v -> v < lower || v > upper).count();
+                    outlierCount = sorted.asList().stream()
+                        .filter(v -> v != null && (v < lower || v > upper)).count();
                     hasOutliers = outlierCount > 0;
                 }
             } catch (Exception ignored) {}

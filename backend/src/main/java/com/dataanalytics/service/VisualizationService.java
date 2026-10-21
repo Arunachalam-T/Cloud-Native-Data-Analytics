@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tech.tablesaw.api.*;
+import tech.tablesaw.columns.Column;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -113,7 +114,8 @@ public class VisualizationService {
 
     private ChartDto buildBoxPlotData(Column<?> col) {
         NumericColumn<?> numCol = (NumericColumn<?>) col;
-        DoubleColumn sorted = numCol.asDoubleColumn().sortAscending();
+        DoubleColumn sorted = numCol.asDoubleColumn().copy();
+        sorted.sortAscending();
 
         Map<String, Object> meta = new LinkedHashMap<>();
         meta.put("min", numCol.min());
@@ -140,16 +142,16 @@ public class VisualizationService {
 
     private ChartDto buildBarChart(Column<?> col) {
         Map<String, Long> counts = new LinkedHashMap<>();
-        try {
-            col.countByCategory().entrySet().stream()
-                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .limit(20)
-                .forEach(e -> counts.put(e.getKey(), (long)(int) e.getValue()));
-        } catch (Exception e) {
-            log.warn("Bar chart gen failed for col {}: {}", col.name(), e.getMessage());
+        for (int r = 0; r < col.size(); r++) {
+            if (!col.isMissing(r)) {
+                String val = col.getString(r);
+                counts.merge(val, 1L, Long::sum);
+            }
         }
 
         List<DataPoint> dataPoints = counts.entrySet().stream()
+            .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+            .limit(20)
             .map(e -> DataPoint.builder().label(e.getKey()).count(e.getValue()).build())
             .collect(Collectors.toList());
 
