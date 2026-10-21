@@ -140,7 +140,8 @@ public class MainViewController implements Initializable {
         new Thread(task, "upload-thread").start();
     }
 
-    void refreshDatasets() {
+    @FXML
+    public void refreshDatasets() {
         setStatus("Loading datasets...", true);
 
         Task<String> task = new Task<>() {

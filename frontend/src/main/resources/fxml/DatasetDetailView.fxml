@@ -55,8 +55,7 @@
             <!-- EDA Report -->
             <Tab fx:id="tabEda" text="📈  EDA Report">
                 <TextArea fx:id="txtEdaReport" styleClass="report-textarea"
-                          editable="false" wrapText="false"
-                          fontFamily="Consolas, monospace"/>
+                          editable="false" wrapText="false"/>
             </Tab>
 
             <!-- Data Quality -->
