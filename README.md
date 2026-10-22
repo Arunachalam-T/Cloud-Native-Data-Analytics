@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ⬡ Cloud-Native Data Analytics Terminal
 
 A full-stack desktop data analytics platform for uploading, analyzing, visualizing, and managing datasets — backed by Spring Boot, PostgreSQL, and AWS S3, with a JavaFX desktop interface.
@@ -87,41 +86,51 @@ cloud-native-data-analytics/
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 🚀 Quick Start (Zero Local DB / Docker Setup Needed!)
+
+This project is pre-configured with a **serverless Neon cloud PostgreSQL database** and a **local storage fallback** for uploads. You do **not** need Docker, local PostgreSQL, or active AWS credentials to run and test everything immediately.
 
 ### Prerequisites
-- Java 21
-- Maven 3.9+
-- Docker & Docker Compose
-- AWS credentials (for S3) or use LocalStack
+- **Java 21 JDK** (e.g. Eclipse Adoptium Temurin 21)
+- **Apache Maven 3.9+**
 
-### 1. Clone & configure
-```bash
-git clone <your-repo>
-cd cloud-native-data-analytics
-cp .env.example .env
-# Edit .env with your AWS credentials and DB settings
-```
+---
 
-### 2. Start PostgreSQL with Docker
-```bash
-docker-compose up postgres -d
-```
+### Option A: 1-Click Launch (Windows)
 
-### 3. Start the backend
+1. Double-click `run-backend.bat` (or run `.\run-backend.bat` in terminal). Wait until you see `Started DataAnalyticsApplication`.
+2. Double-click `run-frontend.bat` (or run `.\run-frontend.bat` in terminal). The JavaFX desktop window will appear.
+3. In the UI, click **"Upload Dataset"**, choose the provided `sample-data/sales_analytics_sample.csv`, and explore the instant EDA statistics, charts, and quality reports!
+
+---
+
+### Option B: Command Line (Cross-Platform)
+
+**1. Start the Backend:**
 ```bash
 cd backend
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-# API available at http://localhost:8080
+mvn spring-boot:run
+# Backend is ready at http://localhost:8080
+# Health check: http://localhost:8080/actuator/health
 ```
 
-### 4. Run the JavaFX frontend
+**2. Start the Frontend:**
 ```bash
 cd frontend
 mvn javafx:run
 ```
 
-### 5. Or run everything with Docker Compose
+---
+
+### Option C: Run Directly in VS Code or IntelliJ
+
+- **Backend:** Open `backend/src/main/java/com/dataanalytics/DataAnalyticsApplication.java` and click **Run**.
+- **Frontend:** Open `frontend/src/main/java/com/dataanalytics/ui/Launcher.java` and click **Run**.
+- A predefined `.vscode/launch.json` is also included with ready-to-use launch configurations: **"Run Backend (Spring Boot)"** and **"Run Frontend (JavaFX UI)"**.
+
+---
+
+### Option D: Docker (Optional for Cloud/Container deployments)
 ```bash
 docker-compose up --build
 ```
@@ -232,7 +241,3 @@ For the CD deploy workflow, add these secrets to your GitHub repository:
 ## 📄 License
 
 MIT — see [LICENSE](LICENSE) for details.
-=======
-# Cloud-Native-Data-Analytics
-The Cloud-Native Data Analytics Terminal is a desktop-based data analytics platform for uploading, analyzing, visualizing, and managing datasets.
->>>>>>> 01f0270e74883c0bff0579de66401ac223d99980

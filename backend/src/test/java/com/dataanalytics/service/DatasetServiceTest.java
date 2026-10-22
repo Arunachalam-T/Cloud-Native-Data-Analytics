@@ -59,8 +59,6 @@ class DatasetServiceTest {
         Page<Dataset> mockPage = new PageImpl<>(List.of(sampleDataset));
         when(datasetRepository.findByStatusNotOrderByCreatedAtDesc(Dataset.DatasetStatus.DELETED, pageable))
             .thenReturn(mockPage);
-        when(columnMetadataRepository.findByDatasetIdOrderByColumnIndex(anyLong()))
-            .thenReturn(List.of());
 
         var result = datasetService.getAllDatasets(pageable);
 

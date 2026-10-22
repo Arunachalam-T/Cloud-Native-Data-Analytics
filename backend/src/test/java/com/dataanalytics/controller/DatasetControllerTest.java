@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -84,7 +85,7 @@ class DatasetControllerTest {
     @WithMockUser(roles = "ADMIN")
     @DisplayName("DELETE /api/v1/datasets/{id} should return 204")
     void delete_returns204() throws Exception {
-        mockMvc.perform(delete("/api/v1/datasets/1"))
+        mockMvc.perform(delete("/api/v1/datasets/1").with(csrf()))
             .andExpect(status().isNoContent());
     }
 }
