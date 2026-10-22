@@ -13,6 +13,11 @@ import tech.tablesaw.columns.Column;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.dataanalytics.model.entity.AnalysisResult;
+import com.dataanalytics.repository.AnalysisResultRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -20,8 +25,20 @@ public class DataQualityService {
 
     private final DatasetRepository datasetRepository;
     private final AnalyticsService analyticsService;
+    private final AnalysisResultRepository analysisResultRepository;
+    private final ObjectMapper objectMapper;
 
     public DataQualityReportDto generateQualityReport(Long datasetId) {
+        var cached = analysisResultRepository.findByDatasetIdAndResultType(datasetId, AnalysisResult.ResultType.QUALITY);
+        if (cached.isPresent()) {
+            log.info("Returning cached Quality report for dataset id={}", datasetId);
+            try {
+                return objectMapper.convertValue(cached.get().getResultData(), DataQualityReportDto.class);
+            } catch (Exception e) {
+                log.warn("Failed to parse cached Quality report, recomputing: {}", e.getMessage());
+            }
+        }
+
         Dataset dataset = datasetRepository.findById(datasetId)
             .filter(d -> d.getStatus() == Dataset.DatasetStatus.READY)
             .orElseThrow(() -> new DatasetNotFoundException("Dataset not found or not ready: " + datasetId));
@@ -48,7 +65,7 @@ public class DataQualityService {
             .average()
             .orElse(100.0);
 
-        return DataQualityReportDto.builder()
+        DataQualityReportDto report = DataQualityReportDto.builder()
             .datasetId(datasetId)
             .datasetName(dataset.getName())
             .totalRows((long) table.rowCount())
@@ -59,6 +76,25 @@ public class DataQualityService {
             .warnings(warnings)
             .recommendations(recommendations)
             .build();
+
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = objectMapper.convertValue(report, Map.class);
+            AnalysisResult result = analysisResultRepository
+                .findByDatasetIdAndResultType(datasetId, AnalysisResult.ResultType.QUALITY)
+                .orElseGet(() -> AnalysisResult.builder()
+                    .dataset(dataset)
+                    .resultType(AnalysisResult.ResultType.QUALITY)
+                    .build());
+            result.setResultData(data);
+            result.setComputedAt(java.time.OffsetDateTime.now());
+            analysisResultRepository.save(result);
+            log.info("Saved Quality analysis result to database for dataset id={}", datasetId);
+        } catch (Exception e) {
+            log.warn("Failed to persist Quality analysis result: {}", e.getMessage());
+        }
+
+        return report;
     }
 
     private DataQualityReportDto.ColumnQualityDto analyzeColumnQuality(

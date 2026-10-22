@@ -114,7 +114,7 @@ public class DatasetDetailController implements Initializable {
                         colIndex < data.getValue().size() ? data.getValue().get(colIndex) : ""
                     )
                 );
-                col.setMinWidth(100);
+                col.setMinWidth(colIndex == 0 ? 80 : 120);
                 tblPreview.getColumns().add(col);
             }
 
@@ -126,7 +126,8 @@ public class DatasetDetailController implements Initializable {
             });
 
             tblPreview.setItems(FXCollections.observableArrayList(rows));
-            setStatus("Preview loaded (" + rows.size() + " rows)", false);
+            long total = preview.path("totalRows").asLong();
+            setStatus("Preview loaded: " + rows.size() + " rows sampled at intervals across " + total + " total rows", false);
         });
 
         task.setOnFailed(e -> setStatus("Preview failed: " + task.getException().getMessage(), false));

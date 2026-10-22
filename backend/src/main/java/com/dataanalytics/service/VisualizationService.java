@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 import tech.tablesaw.api.*;
 import tech.tablesaw.columns.Column;
 
+import com.dataanalytics.model.entity.AnalysisResult;
+import com.dataanalytics.repository.AnalysisResultRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,6 +25,8 @@ public class VisualizationService {
 
     private final DatasetRepository datasetRepository;
     private final AnalyticsService analyticsService;
+    private final AnalysisResultRepository analysisResultRepository;
+    private final ObjectMapper objectMapper;
 
     /**
      * Generate chart data for all appropriate columns in the dataset.
@@ -29,6 +35,16 @@ public class VisualizationService {
      * - First two numeric columns → scatter plot data
      */
     public VisualizationDto generateVisualizations(Long datasetId) {
+        var cached = analysisResultRepository.findByDatasetIdAndResultType(datasetId, AnalysisResult.ResultType.VISUALIZATION);
+        if (cached.isPresent()) {
+            log.info("Returning cached Visualization data for dataset id={}", datasetId);
+            try {
+                return objectMapper.convertValue(cached.get().getResultData(), VisualizationDto.class);
+            } catch (Exception e) {
+                log.warn("Failed to parse cached Visualization data, recomputing: {}", e.getMessage());
+            }
+        }
+
         Dataset dataset = datasetRepository.findById(datasetId)
             .filter(d -> d.getStatus() == Dataset.DatasetStatus.READY)
             .orElseThrow(() -> new DatasetNotFoundException("Dataset not found or not ready: " + datasetId));
@@ -67,10 +83,29 @@ public class VisualizationService {
             charts.add(buildScatterPlot(numericColumns.get(0), numericColumns.get(1)));
         }
 
-        return VisualizationDto.builder()
+        VisualizationDto dto = VisualizationDto.builder()
             .datasetId(datasetId)
             .charts(charts)
             .build();
+
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = objectMapper.convertValue(dto, Map.class);
+            AnalysisResult result = analysisResultRepository
+                .findByDatasetIdAndResultType(datasetId, AnalysisResult.ResultType.VISUALIZATION)
+                .orElseGet(() -> AnalysisResult.builder()
+                    .dataset(dataset)
+                    .resultType(AnalysisResult.ResultType.VISUALIZATION)
+                    .build());
+            result.setResultData(data);
+            result.setComputedAt(java.time.OffsetDateTime.now());
+            analysisResultRepository.save(result);
+            log.info("Saved Visualization analysis result to database for dataset id={}", datasetId);
+        } catch (Exception e) {
+            log.warn("Failed to persist Visualization analysis result: {}", e.getMessage());
+        }
+
+        return dto;
     }
 
     private ChartDto buildHistogram(Column<?> col) {

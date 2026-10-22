@@ -12,6 +12,11 @@ import tech.tablesaw.api.*;
 import tech.tablesaw.columns.Column;
 import tech.tablesaw.io.csv.CsvReadOptions;
 
+import com.dataanalytics.model.entity.AnalysisResult;
+import com.dataanalytics.repository.AnalysisResultRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -24,8 +29,20 @@ public class AnalyticsService {
 
     private final DatasetRepository datasetRepository;
     private final S3Service s3Service;
+    private final AnalysisResultRepository analysisResultRepository;
+    private final ObjectMapper objectMapper;
 
     public EdaReportDto generateEdaReport(Long datasetId) {
+        var cached = analysisResultRepository.findByDatasetIdAndResultType(datasetId, AnalysisResult.ResultType.EDA);
+        if (cached.isPresent()) {
+            log.info("Returning cached EDA report for dataset id={}", datasetId);
+            try {
+                return objectMapper.convertValue(cached.get().getResultData(), EdaReportDto.class);
+            } catch (Exception e) {
+                log.warn("Failed to parse cached EDA report, recomputing: {}", e.getMessage());
+            }
+        }
+
         Dataset dataset = findReadyDataset(datasetId);
         Table table = loadTable(dataset.getS3Key());
 
@@ -42,7 +59,7 @@ public class AnalyticsService {
         // Build simple correlation matrix for numeric columns
         Map<String, Object> correlationMatrix = buildCorrelationMatrix(table);
 
-        return EdaReportDto.builder()
+        EdaReportDto report = EdaReportDto.builder()
             .datasetId(datasetId)
             .datasetName(dataset.getName())
             .rowCount((long) table.rowCount())
@@ -53,6 +70,24 @@ public class AnalyticsService {
             .columns(columnReports)
             .correlationMatrix(correlationMatrix)
             .build();
+
+        try {
+            Map<String, Object> dataMap = objectMapper.convertValue(report, new TypeReference<Map<String, Object>>() {});
+            AnalysisResult result = analysisResultRepository
+                .findByDatasetIdAndResultType(datasetId, AnalysisResult.ResultType.EDA)
+                .orElseGet(() -> AnalysisResult.builder()
+                    .dataset(dataset)
+                    .resultType(AnalysisResult.ResultType.EDA)
+                    .build());
+            result.setResultData(dataMap);
+            result.setComputedAt(java.time.OffsetDateTime.now());
+            analysisResultRepository.save(result);
+            log.info("Stored EDA report in analysis_results table for dataset id={}", datasetId);
+        } catch (Exception e) {
+            log.warn("Failed to save EDA report to analysis_results: {}", e.getMessage());
+        }
+
+        return report;
     }
 
     private EdaReportDto.ColumnEdaDto analyzeColumn(Column<?> col, int totalRows) {

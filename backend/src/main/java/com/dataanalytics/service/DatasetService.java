@@ -136,30 +136,52 @@ public class DatasetService {
 
         try (InputStream is = s3Service.downloadFile(dataset.getS3Key())) {
             Table table = Table.read().csv(CsvReadOptions.builder(is).build());
-            int displayRows = Math.min(rows, table.rowCount());
-            Table preview = table.rows(0, displayRows);
+            int totalRows = table.rowCount();
+            int sampleCount = Math.min(rows > 0 ? rows : 50, totalRows);
 
-            List<String> headers = table.columnNames();
+            List<String> headers = new ArrayList<>();
+            headers.add("# Row");
+            headers.addAll(table.columnNames());
+
             Map<String, String> columnTypes = new LinkedHashMap<>();
+            columnTypes.put("# Row", "INTEGER");
             table.columns().forEach(c -> columnTypes.put(c.name(), c.type().name()));
 
             List<List<String>> rowData = new ArrayList<>();
-            for (int r = 0; r < preview.rowCount(); r++) {
-                List<String> row = new ArrayList<>();
-                for (var col : preview.columns()) {
-                    Object val = col.get(r);
-                    row.add(val == null ? "" : val.toString());
+            if (totalRows > 0 && sampleCount > 0) {
+                if (totalRows <= sampleCount) {
+                    for (int r = 0; r < totalRows; r++) {
+                        List<String> row = new ArrayList<>();
+                        row.add(String.valueOf(r + 1));
+                        for (var col : table.columns()) {
+                            Object val = col.get(r);
+                            row.add(val == null ? "" : val.toString());
+                        }
+                        rowData.add(row);
+                    }
+                } else {
+                    double step = (double) (totalRows - 1) / (sampleCount - 1);
+                    for (int i = 0; i < sampleCount; i++) {
+                        int r = (int) Math.round(i * step);
+                        if (r >= totalRows) r = totalRows - 1;
+                        List<String> row = new ArrayList<>();
+                        row.add(String.valueOf(r + 1));
+                        for (var col : table.columns()) {
+                            Object val = col.get(r);
+                            row.add(val == null ? "" : val.toString());
+                        }
+                        rowData.add(row);
+                    }
                 }
-                rowData.add(row);
             }
 
             return DataPreviewDto.builder()
                 .datasetId(id)
                 .headers(headers)
                 .rows(rowData)
-                .totalRows((long) table.rowCount())
-                .displayedRows(displayRows)
-                .totalColumns(table.columnCount())
+                .totalRows((long) totalRows)
+                .displayedRows(rowData.size())
+                .totalColumns(table.columnCount() + 1)
                 .columnTypes(columnTypes)
                 .build();
 
