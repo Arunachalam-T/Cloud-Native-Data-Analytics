@@ -54,9 +54,12 @@ public class VisualizationService {
             charts.add(buildBoxPlotData(col));
         }
 
-        // Bar charts for categorical columns
+        // Bar charts and Pie charts for categorical columns
         for (Column<?> col : categoricalColumns.stream().limit(5).collect(Collectors.toList())) {
             charts.add(buildBarChart(col));
+            if (col.countUnique() <= 8 && col.countUnique() >= 2) {
+                charts.add(buildPieChart(col));
+            }
         }
 
         // Scatter plot: first 2 numeric columns
@@ -160,6 +163,29 @@ public class VisualizationService {
             .title("Value Distribution: " + col.name())
             .xLabel(col.name())
             .yLabel("Count")
+            .xColumn(col.name())
+            .dataPoints(dataPoints)
+            .build();
+    }
+
+    private ChartDto buildPieChart(Column<?> col) {
+        Map<String, Long> counts = new LinkedHashMap<>();
+        for (int r = 0; r < col.size(); r++) {
+            if (!col.isMissing(r)) {
+                String val = col.getString(r);
+                counts.merge(val, 1L, Long::sum);
+            }
+        }
+
+        List<DataPoint> dataPoints = counts.entrySet().stream()
+            .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+            .limit(8)
+            .map(e -> DataPoint.builder().label(e.getKey()).count(e.getValue()).build())
+            .collect(Collectors.toList());
+
+        return ChartDto.builder()
+            .chartType("PIE")
+            .title("Proportion Breakdown: " + col.name())
             .xColumn(col.name())
             .dataPoints(dataPoints)
             .build();

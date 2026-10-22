@@ -279,6 +279,7 @@ public class DatasetDetailController implements Initializable {
                 Chart fxChart = switch (type) {
                     case "HISTOGRAM", "BAR" -> buildBarChart(chart);
                     case "SCATTER" -> buildScatterChart(chart);
+                    case "PIE" -> buildPieChart(chart);
                     default -> null;
                 };
                 if (fxChart != null) {
@@ -328,6 +329,21 @@ public class DatasetDetailController implements Initializable {
             series.getData().add(new XYChart.Data<>(dp.path("x").asDouble(), dp.path("y").asDouble()))
         );
         chart.getData().add(series);
+        return chart;
+    }
+
+    private PieChart buildPieChart(JsonNode chartData) {
+        PieChart chart = new PieChart();
+        chart.setTitle(chartData.path("title").asText());
+        var pieData = FXCollections.<PieChart.Data>observableArrayList();
+        chartData.path("dataPoints").forEach(dp -> {
+            String label = dp.path("label").asText();
+            double count = dp.has("count") ? dp.path("count").asDouble() : 1.0;
+            pieData.add(new PieChart.Data(label, count));
+        });
+        chart.setData(pieData);
+        chart.setLabelsVisible(true);
+        chart.setLegendVisible(true);
         return chart;
     }
 
