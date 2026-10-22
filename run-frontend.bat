@@ -18,8 +18,15 @@ if exist .env (
     )
 )
 
-set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot
-set PATH=%JAVA_HOME%\bin;C:\Users\Arunachalam\.maven\apache-maven-3.9.6\bin;%PATH%
+if not defined JAVA_HOME (
+    if exist "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot" (
+        set "JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot"
+    )
+)
+if defined JAVA_HOME set "PATH=%JAVA_HOME%\bin;%PATH%"
+if exist "%USERPROFILE%\.maven\apache-maven-3.9.6\bin" (
+    set "PATH=%USERPROFILE%\.maven\apache-maven-3.9.6\bin;%PATH%"
+)
 
 cd frontend
 mvn javafx:run
