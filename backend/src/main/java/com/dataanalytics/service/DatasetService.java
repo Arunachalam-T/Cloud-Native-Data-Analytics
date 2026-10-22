@@ -34,9 +34,8 @@ public class DatasetService {
     private final S3Service s3Service;
 
     /**
-     * Upload a file: save to S3, create DB record, then kick off async analysis.
+     * Upload a file: save to S3/local, create DB record, then kick off async analysis.
      */
-    @Transactional
     public DatasetDto uploadDataset(MultipartFile file, String name, String description) {
         validateFile(file);
 
@@ -63,8 +62,8 @@ public class DatasetService {
         Dataset saved = datasetRepository.save(dataset);
         log.info("Dataset record created: id={}, name={}", saved.getId(), saved.getName());
 
-        // Trigger async processing
-        processDatasetAsync(saved.getId(), s3Key);
+        // Trigger truly asynchronous processing in background thread
+        java.util.concurrent.CompletableFuture.runAsync(() -> processDatasetAsync(saved.getId(), s3Key));
 
         return mapToDto(saved, false);
     }
