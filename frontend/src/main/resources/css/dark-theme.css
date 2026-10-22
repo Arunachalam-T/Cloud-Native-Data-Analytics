@@ -302,3 +302,58 @@
 .scroll-bar .track { -fx-background-color: -bg-secondary; }
 .scroll-bar .thumb { -fx-background-color: -border; -fx-background-radius: 4; }
 .scroll-bar .thumb:hover { -fx-background-color: -text-muted; }
+
+/* ── Settings Cards & Forms ──────────────────────────────────── */
+.card {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 20;
+}
+
+.card-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+.card-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-muted;
+}
+
+.form-label {
+    -fx-text-fill: -text-secondary;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.form-input {
+    -fx-background-color: -bg-secondary;
+    -fx-text-fill: -text-primary;
+    -fx-border-color: -border;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12;
+}
+
+.form-input:focused {
+    -fx-border-color: -accent;
+}
+
+.badge-green {
+    -fx-background-color: rgba(74,222,128,0.15);
+    -fx-text-fill: -success;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10;
+    -fx-background-radius: 6;
+}
+
+.badge-blue {
+    -fx-background-color: rgba(99,102,241,0.15);
+    -fx-text-fill: -accent-hover;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10;
+    -fx-background-radius: 6;
+}

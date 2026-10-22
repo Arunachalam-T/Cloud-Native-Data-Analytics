@@ -21,15 +21,18 @@
 
             <!-- Nav buttons -->
             <Button fx:id="btnDashboard" text="📊  Dashboard"
-                    styleClass="nav-btn, nav-btn-active" maxWidth="Infinity"/>
+                    styleClass="nav-btn, nav-btn-active" maxWidth="Infinity"
+                    onAction="#handleShowDashboard"/>
             <Button fx:id="btnUpload" text="⬆  Upload Dataset"
                     styleClass="nav-btn" maxWidth="Infinity"
                     onAction="#handleUploadAction"/>
             <Button fx:id="btnDatasets" text="🗄  All Datasets"
-                    styleClass="nav-btn" maxWidth="Infinity"/>
+                    styleClass="nav-btn" maxWidth="Infinity"
+                    onAction="#handleShowDatasets"/>
             <Separator styleClass="sidebar-divider"/>
             <Button fx:id="btnSettings" text="⚙  Settings"
-                    styleClass="nav-btn" maxWidth="Infinity"/>
+                    styleClass="nav-btn" maxWidth="Infinity"
+                    onAction="#handleShowSettings"/>
 
             <VBox VBox.vgrow="ALWAYS"/>
 
@@ -57,23 +60,98 @@
                         onAction="#refreshDatasets"/>
             </HBox>
 
-            <!-- Dataset Table -->
+            <!-- Main Content Area -->
             <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS">
                 <padding><Insets top="16" right="24" bottom="16" left="24"/></padding>
-                <TableView fx:id="tblDatasets" styleClass="data-table">
-                    <columns>
-                        <TableColumn fx:id="colName"    text="Dataset Name"  prefWidth="220"/>
-                        <TableColumn fx:id="colStatus"  text="Status"        prefWidth="110"/>
-                        <TableColumn fx:id="colRows"    text="Rows"          prefWidth="90"/>
-                        <TableColumn fx:id="colCols"    text="Columns"       prefWidth="80"/>
-                        <TableColumn fx:id="colFormat"  text="Format"        prefWidth="80"/>
-                        <TableColumn fx:id="colCreated" text="Created At"    prefWidth="180"/>
-                    </columns>
-                    <placeholder>
-                        <Label text="No datasets yet. Upload your first dataset! 🚀"
-                               styleClass="table-placeholder"/>
-                    </placeholder>
-                </TableView>
+                
+                <!-- Dataset Table View -->
+                <VBox fx:id="viewDatasets" spacing="12" VBox.vgrow="ALWAYS">
+                    <TableView fx:id="tblDatasets" styleClass="data-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colName"    text="Dataset Name"  prefWidth="220"/>
+                            <TableColumn fx:id="colStatus"  text="Status"        prefWidth="110"/>
+                            <TableColumn fx:id="colRows"    text="Rows"          prefWidth="90"/>
+                            <TableColumn fx:id="colCols"    text="Columns"       prefWidth="80"/>
+                            <TableColumn fx:id="colFormat"  text="Format"        prefWidth="80"/>
+                            <TableColumn fx:id="colCreated" text="Created At"    prefWidth="180"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No datasets yet. Upload your first dataset! 🚀"
+                                   styleClass="table-placeholder"/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+
+                <!-- Settings View -->
+                <ScrollPane fx:id="viewSettings" fitToWidth="true" styleClass="charts-scroll" visible="false" managed="false">
+                    <VBox spacing="18" alignment="TOP_CENTER">
+                        <padding><Insets top="10" right="20" bottom="20" left="20"/></padding>
+                        
+                        <!-- Backend API Card -->
+                        <VBox styleClass="card" spacing="12" maxWidth="800">
+                            <Label text="Backend API Configuration" styleClass="card-title"/>
+                            <Label text="Configure the REST API endpoint and authentication credentials." styleClass="card-subtitle"/>
+                            <Separator styleClass="sidebar-divider"/>
+                            
+                            <VBox spacing="6">
+                                <Label text="Server Base URL" styleClass="form-label"/>
+                                <TextField fx:id="txtBackendUrl" styleClass="form-input" text="http://localhost:8080"/>
+                            </VBox>
+                            
+                            <VBox spacing="6">
+                                <Label text="API Key / Auth Password" styleClass="form-label"/>
+                                <TextField fx:id="txtApiKey" styleClass="form-input" text="admin"/>
+                            </VBox>
+
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <Button text="⚡  Test Connection" styleClass="btn-secondary" onAction="#handleTestConnection"/>
+                                <Button text="💾  Save Settings" styleClass="btn-primary" onAction="#handleSaveSettings"/>
+                                <Label fx:id="lblConnectionResult" text="" styleClass="form-label"/>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Cloud Database Card -->
+                        <VBox styleClass="card" spacing="12" maxWidth="800">
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label text="Cloud Database (Neon PostgreSQL)" styleClass="card-title"/>
+                                <Label text="ONLINE" styleClass="badge-green"/>
+                            </HBox>
+                            <Label text="Decoupled cloud serverless PostgreSQL instance." styleClass="card-subtitle"/>
+                            <Separator styleClass="sidebar-divider"/>
+                            
+                            <GridPane hgap="16" vgap="8">
+                                <Label text="Host:" styleClass="meta-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                <Label text="ep-divine-math-aolpu2xg.c-2.ap-southeast-1.aws.neon.tech" styleClass="meta-value" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                
+                                <Label text="Database:" styleClass="meta-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                                <Label text="neondb (PostgreSQL 16+)" styleClass="meta-value" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                                <Label text="Migrations:" styleClass="meta-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                                <Label text="Flyway V1, V2, V3 Schema applied" styleClass="meta-value" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                            </GridPane>
+                        </VBox>
+
+                        <!-- Storage & Engine Info Card -->
+                        <VBox styleClass="card" spacing="12" maxWidth="800">
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label text="Storage &amp; Processing Engine" styleClass="card-title"/>
+                                <Label text="ACTIVE" styleClass="badge-blue"/>
+                            </HBox>
+                            <Separator styleClass="sidebar-divider"/>
+                            
+                            <GridPane hgap="16" vgap="8">
+                                <Label text="File Storage Mode:" styleClass="meta-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                <Label text="Local Storage Fallback (backend/uploads/) + AWS S3 Support" styleClass="meta-value" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                
+                                <Label text="Analytics Engine:" styleClass="meta-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                                <Label text="Tablesaw 0.43 (In-Memory Java Vectorized Engine)" styleClass="meta-value" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                                <Label text="Java Runtime:" styleClass="meta-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                                <Label text="Eclipse Adoptium Temurin JDK 21 LTS" styleClass="meta-value" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                            </GridPane>
+                        </VBox>
+                    </VBox>
+                </ScrollPane>
             </StackPane>
 
             <!-- Status Bar -->

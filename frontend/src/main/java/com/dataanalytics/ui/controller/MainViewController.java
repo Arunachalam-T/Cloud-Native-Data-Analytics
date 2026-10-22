@@ -32,6 +32,13 @@ public class MainViewController implements Initializable {
     // ── Content Area ─────────────────────────────────
     @FXML private StackPane contentArea;
     @FXML private Label lblPageTitle;
+    @FXML private VBox viewDatasets;
+    @FXML private ScrollPane viewSettings;
+
+    // ── Settings Fields ───────────────────────────────
+    @FXML private TextField txtBackendUrl;
+    @FXML private TextField txtApiKey;
+    @FXML private Label lblConnectionResult;
 
     // ── Dataset Table ─────────────────────────────────
     @FXML private TableView<JsonNode> tblDatasets;
@@ -191,6 +198,120 @@ public class MainViewController implements Initializable {
 
     private void loadDashboard() {
         lblPageTitle.setText("Dashboard");
+    }
+
+    @FXML
+    public void handleShowDashboard() {
+        setActiveNav(btnDashboard);
+        lblPageTitle.setText("Dashboard");
+        if (viewDatasets != null) {
+            viewDatasets.setVisible(true);
+            viewDatasets.setManaged(true);
+        }
+        if (viewSettings != null) {
+            viewSettings.setVisible(false);
+            viewSettings.setManaged(false);
+        }
+        refreshDatasets();
+    }
+
+    @FXML
+    public void handleShowDatasets() {
+        setActiveNav(btnDatasets);
+        lblPageTitle.setText("All Datasets (" + datasetList.size() + ")");
+        if (viewDatasets != null) {
+            viewDatasets.setVisible(true);
+            viewDatasets.setManaged(true);
+        }
+        if (viewSettings != null) {
+            viewSettings.setVisible(false);
+            viewSettings.setManaged(false);
+        }
+        refreshDatasets();
+    }
+
+    @FXML
+    public void handleShowSettings() {
+        setActiveNav(btnSettings);
+        lblPageTitle.setText("Settings & System Configuration");
+        if (viewDatasets != null) {
+            viewDatasets.setVisible(false);
+            viewDatasets.setManaged(false);
+        }
+        if (viewSettings != null) {
+            viewSettings.setVisible(true);
+            viewSettings.setManaged(true);
+        }
+    }
+
+    private void setActiveNav(Button active) {
+        for (Button btn : java.util.List.of(btnDashboard, btnDatasets, btnSettings)) {
+            if (btn != null) {
+                btn.getStyleClass().remove("nav-btn-active");
+            }
+        }
+        if (active != null && !active.getStyleClass().contains("nav-btn-active")) {
+            active.getStyleClass().add("nav-btn-active");
+        }
+    }
+
+    @FXML
+    private void handleTestConnection() {
+        if (lblConnectionResult != null) {
+            lblConnectionResult.setText("Testing connection...");
+            lblConnectionResult.setStyle("-fx-text-fill: #facc15;");
+        }
+
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() throws Exception {
+                String response = ApiClient.getInstance().getRaw("/actuator/health");
+                return response != null && response.contains("UP");
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            if (Boolean.TRUE.equals(task.getValue())) {
+                if (lblConnectionResult != null) {
+                    lblConnectionResult.setText("✓ Connected successfully! Status: UP");
+                    lblConnectionResult.setStyle("-fx-text-fill: #4ade80;");
+                }
+            } else {
+                if (lblConnectionResult != null) {
+                    lblConnectionResult.setText("⚠ Connected but status not UP");
+                    lblConnectionResult.setStyle("-fx-text-fill: #facc15;");
+                }
+            }
+        });
+
+        task.setOnFailed(e -> {
+            if (lblConnectionResult != null) {
+                lblConnectionResult.setText("✗ Connection failed: " + task.getException().getMessage());
+                lblConnectionResult.setStyle("-fx-text-fill: #f87171;");
+            }
+        });
+
+        new Thread(task).start();
+    }
+
+    @FXML
+    private void handleSaveSettings() {
+        if (txtBackendUrl != null) {
+            String newUrl = txtBackendUrl.getText().trim();
+            if (!newUrl.isEmpty()) {
+                System.setProperty("API_BASE_URL", newUrl);
+            }
+        }
+        if (txtApiKey != null) {
+            String newKey = txtApiKey.getText().trim();
+            if (!newKey.isEmpty()) {
+                System.setProperty("API_KEY", newKey);
+            }
+        }
+        if (lblConnectionResult != null) {
+            lblConnectionResult.setText("✓ Settings saved for current session.");
+            lblConnectionResult.setStyle("-fx-text-fill: #4ade80;");
+        }
     }
 
     @FXML
